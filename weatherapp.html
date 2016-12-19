@@ -1,0 +1,192 @@
+
+
+<!DOCTYPE html>
+<html >
+
+<head>
+  <meta charset="UTF-8">
+  <title>Local Weather app</title>
+
+
+
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css'>
+<link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css'>
+
+      <style>
+      /* To do:
+Interpolate background color between blue (lowest temperature ever recorded) and red (hihghest temperature) ever recorded */
+body{
+  background-color:#7E57C2;
+}
+h1{
+  font-size: 52px;
+}
+#icon{
+  width:200px;
+}
+div {
+/*     opacity: 0.7; */
+}
+.title{
+  color: white;
+  font-weight: bold;
+/*   opacity: 0.7; */
+}
+.location{
+  opacity:0.7;
+  font-weight: bold;
+}
+.temp{
+  margin-right: -18px;
+}
+.unitButton{
+  margin-left: -18px;
+}
+.units {
+    background-color: rgba(255,255,255,0);
+    border: none;
+    color: white;
+    text-align: center;
+    text-decoration: none;
+}
+    </style>
+
+  <script>
+  window.console = window.console || function(t) {};
+</script>
+
+
+
+  <script>
+  if (document.location.search.match(/type=embed/gi)) {
+    window.parent.postMessage("resize", "*");
+  }
+</script>
+
+</head>
+
+<body translate="no" >
+
+  <body>
+  <!--       <i class="wi wi-day-sunny"></i> -->
+    <div class="container-fluid">
+    <h1 class="text-center title">Local Weather</h1>
+    <div class="text-center">
+
+      <img id="icon" src="" alt="Weather condition image">
+    </div>
+    <div class="row">
+      <div class="col-lg-6 col-xs-6">
+        <h2 class="text-right temp">Measuring Temperature... </h2>
+      </div>
+      <div class="col-lg-6 col-xs-6">
+        <h2 class="text-left unitButton"><button class=" units" </button></h2>
+      </div>
+    </div>
+    <h2 class="text-center location">Locating you...</h2>
+
+  </div>
+
+<!-- <div class="row">
+  <div class="col-sm-9">
+    Level 1: .col-sm-9
+    <div class="row">
+      <div class="col-xs-8 col-sm-6">
+        Level 2: .col-xs-8 .col-sm-6
+      </div>
+      <div class="col-xs-4 col-sm-6">
+        Level 2: .col-xs-4 .col-sm-6
+      </div>
+    </div>
+  </div> -->
+</div>
+</body>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/weather-icons/1.3.2/css/weather-icons.min.css'></script>
+
+    <script>
+    var units = '';
+var iconElement;
+$(document).ready(function () {
+    getLocation();
+});
+function getLocation() {
+    $.getJSON('http://ipinfo.io/json?callback=?', function (data) {
+        var location = [];
+        location[0] = data.city;
+        location[1] = data.country;
+        $('.location').html(location[0] + ', ' + location[1]);
+        getWeather(location[0], location[1]);
+    });
+}
+function getWeather(city, country) {
+    var api = 'http://api.openweathermap.org/data/2.5/weather?q=';
+    var location = city;
+    var APPID = '74898c1855783d2682757d0c09b49339';
+    if (country === 'US')
+        units = 'imperial';
+    else
+        units = 'metric';
+    $.getJSON(api + city + '&units=' + units + '&APPID=' + APPID + '&callback=?', function (data) {
+        var weatherID = data.weather[0].id;
+        var temp = Math.round(data.main.temp);
+        var symbol = '';
+        switch (units) {
+        case 'metric':
+            changeUnitSymbol('C');
+            break;
+        case 'imperial':
+            changeUnitSymbol('F');
+            break;
+        default:
+            symbol = 'unknown';
+        }
+        $('.temp').html(temp);
+        iconElement = document.getElementById('icon');
+        console.log(weatherID);
+        if (weatherID < 300) {
+            changeIcon('11.svg');
+        } else if (weatherID >= 300 & weatherID < 400) {
+            changeIcon('09.svg');
+        } else if (weatherID >= 500 & weatherID < 600) {
+            changeIcon('10.svg');
+        } else if (weatherID >= 600 && weatherID < 700) {
+            changeIcon('13.svg');
+        } else if (weatherID >= 700 & weatherID < 800) {
+            changeIcon('50.svg');
+        } else if (weatherID >= 800 & weatherID < 900) {
+            changeIcon('01.svg');
+        }
+    });
+}
+function changeIcon(img) {
+    iconElement.src = 'https://dl.dropboxusercontent.com/u/70487206/' + img;
+}
+$('.units').click(function () {
+    if (units === 'imperial') {
+        changeUnitSymbol('C');
+        units = 'metric';
+        $('.temp').html(fToC(parseInt($('.temp').text())));
+    } else {
+        changeUnitSymbol('F');
+        units = 'imperial';
+        $('.temp').html(cToF(parseInt($('.temp').text())));
+    }
+});
+function changeUnitSymbol(symb) {
+    $('.units').html('&#176' + symb);
+}
+function cToF(temp) {
+    return Math.round(temp * 9 / 5 + 32);
+}
+function fToC(temp) {
+    return Math.round((temp - 32) / (9 / 5));
+}
+  //# sourceURL=pen.js
+  </script>
+
+
+
+
+</body>
+</html>
